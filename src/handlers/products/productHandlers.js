@@ -54,8 +54,8 @@ const updateProduct = async (ctx) => {
 const getProductById = async (ctx) => {
   try {
     const { id } = ctx.params;
-    const { field } = ctx.request.query;
-    const product = productRepository.getProductById({ id, field });
+    const fields = ctx.request.query.field;
+    const product = productRepository.getProductById({ id, fields });
     if (!product) {
       ctx.status = 404;
       return (ctx.body = {

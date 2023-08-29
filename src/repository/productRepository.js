@@ -89,12 +89,19 @@ const updateProduct = (ctx) => {
   );
 };
 
-const getProductById = ({ id, field }) => {
-  if (field) {
+const getProductById = ({ id, fields }) => {
+  if (fields) {
+    const newObjProduct = {};
     const product = dataProductParser.data.find(
       (product) => product.id === +id
     );
-    return product[field];
+    const arrFields = fields.split(",");
+    for (let i = 0; i < arrFields.length; i++) {
+      if (arrFields.length !== 0) {
+        newObjProduct[arrFields[i]] = product[arrFields[i]];
+      }
+    }
+    return newObjProduct;
   }
 
   return dataProductParser.data.find((product) => product.id === +id);
