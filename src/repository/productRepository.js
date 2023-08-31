@@ -1,120 +1,67 @@
-import fs from "fs";
-import formatDate from "../common/formatDate.js";
-import { pathToFileProductJson } from "../constant/path.js";
+import currentDate from "../common/formatDate.js";
+import productWithFieldsParam from "../helpers/fieldPicked.js";
+import {
+  getDataFromDatabase,
+  saveDataIntoDatabase,
+} from "../helpers/getAndSaveData.js";
+import orderProductByDate from "../helpers/sortProductByDate.js";
 
-const dataProductJson = fs.readFileSync(pathToFileProductJson, "utf8");
-const dataProductParser = JSON.parse(dataProductJson);
+const products = getDataFromDatabase();
 
 const getAllProducts = ({ limit, sort }) => {
   if (sort && limit) {
-    const items = dataProductParser.data.slice(0, limit).map((item) => item);
-    const sortedProducts = items.slice().sort((a, b) => {
-      const dateA = new Date(a.createdAt);
-      const dateB = new Date(b.createdAt);
-
-      if (sort === "asc") {
-        return dateA - dateB;
-      } else if (sort === "desc") {
-        return dateB - dateA;
-      }
-    });
-    return sortedProducts;
+    const sortedProducts = orderProductByDate(products, sort);
+    return sortedProducts.slice(0, limit);
   }
 
   if (limit) {
-    return dataProductParser.data.slice(0, limit).map((item) => item);
+    return products.slice(0, limit);
   }
   if (sort) {
-    return dataProductParser.data.slice().sort((a, b) => {
-      const dateA = new Date(a.createdAt);
-      const dateB = new Date(b.createdAt);
-
-      if (sort === "asc") {
-        return dateA - dateB;
-      } else if (sort === "desc") {
-        return dateB - dateA;
-      }
-    });
+    return orderProductByDate(products, sort);
   }
 
-  return dataProductParser.data;
+  return products;
 };
 
 const addNewProduct = (newProduct) => {
-  const createdAt = new Date();
-  const createFormat = formatDate(createdAt);
-  const idIncreasing = dataProductParser.data.length + 1;
-  const updateListProducts = [
-    ...dataProductParser.data,
-    { id: idIncreasing, createAt: createFormat, ...newProduct },
+  const createdAt = currentDate();
+  const idIncreasing = products.length + 1;
+  const newProducts = [
+    ...products,
+    { ...newProduct, id: idIncreasing, createAt: createdAt },
   ];
-  return fs.writeFileSync(
-    pathToFileProductJson,
-    JSON.stringify({
-      data: updateListProducts,
-    })
-  );
+  return saveDataIntoDatabase(newProducts);
 };
 
 const updateProduct = (ctx) => {
-  const { id } = ctx.params;
   const putProduct = ctx.request.body;
+  const updateAt = currentDate();
 
-  const createdAt = new Date();
-  const createFormat = formatDate(createdAt);
-
-  if (!id) return;
-
-  const newListProducts = dataProductParser.data.map((product) => {
-    if (product.id === +id) {
+  const newListProducts = products.map((product) => {
+    if (product.id === putProduct.id) {
       return {
         ...product,
-        name: putProduct.name,
-        price: putProduct.price,
-        color: putProduct.color,
-        description: putProduct.description,
-        image: putProduct.image,
-        product: putProduct.product,
-        createdAt: createFormat,
+        ...putProduct,
+        updatedAt: updateAt,
       };
     }
     return product;
   });
-
-  return fs.writeFileSync(
-    pathToFileProductJson,
-    JSON.stringify({
-      data: newListProducts,
-    })
-  );
+  return saveDataIntoDatabase(newListProducts);
 };
 
 const getProductById = ({ id, fields }) => {
+  const product = products.find((product) => product.id === parseInt(id));
   if (fields) {
-    const newObjProduct = {};
-    const product = dataProductParser.data.find(
-      (product) => product.id === +id
-    );
-    const arrFields = fields.split(",");
-    for (let i = 0; i < arrFields.length; i++) {
-      if (arrFields.length !== 0) {
-        newObjProduct[arrFields[i]] = product[arrFields[i]];
-      }
-    }
-    return newObjProduct;
+    return productWithFieldsParam(product, fields);
   }
-
-  return dataProductParser.data.find((product) => product.id === +id);
+  return product;
 };
 
 const removeProductById = (id) => {
-  const result = dataProductParser.data.filter((product) => product.id !== id);
-  return fs.writeFileSync(
-    pathToFileProductJson,
-    JSON.stringify({
-      data: result,
-    })
-  );
+  const result = products.filter((product) => product.id !== id);
+  return saveDataIntoDatabase(result);
 };
 
 export default {

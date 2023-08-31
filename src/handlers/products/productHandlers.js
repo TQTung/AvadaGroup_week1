@@ -36,7 +36,7 @@ const addProduct = async (ctx) => {
 
 const updateProduct = async (ctx) => {
   try {
-    const { id } = ctx.params;
+    const { id } = ctx.request.body;
     productRepository.updateProduct(ctx);
     ctx.status = 201;
     return (ctx.body = {

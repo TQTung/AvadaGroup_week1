@@ -2,13 +2,14 @@
   "data": [
     {
       "id": 2,
-      "name": "Cheese",
-      "product": "Steel",
+      "name": "testUpdate12312312",
+      "product": "type TestUpdate",
       "image": "https://loremflickr.com/640/480",
-      "color": "grey",
-      "price": 535,
-      "description": "The beautiful range of Apple Naturalé that has an exciting mix of natural ingredients. With the Goodness of 100% Natural Ingredients",
-      "createdAt": "2023-04-22T21:21:10.602Z"
+      "color": "pink testUpdate",
+      "price": 3123,
+      "description": "description testUpdate",
+      "createdAt": "2023-04-22T21:21:10.602Z",
+      "updateAt": "2023-08-31T04:28:54.353Z"
     },
     {
       "id": 3,

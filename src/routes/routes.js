@@ -17,11 +17,7 @@ router.post("/books", bookInputMiddleware, bookHandlers.addBook);
 router.get("/products", productHandlers.getAllProducts);
 router.post("/products", productInputMiddleware, productHandlers.addProduct);
 router.get("/products/:id", productHandlers.getProductById);
-router.put(
-  "/products/:id",
-  productInputMiddleware,
-  productHandlers.updateProduct
-);
+router.put("/products", productInputMiddleware, productHandlers.updateProduct);
 router.delete("/products/:id", productHandlers.deleteProduct);
 
 export default router;

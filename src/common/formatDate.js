@@ -10,4 +10,9 @@ const formatDate = (date) => {
   return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}Z`;
 };
 
-export default formatDate;
+const currentDate = () => {
+  const date = new Date();
+  return formatDate(date);
+};
+
+export default currentDate;
